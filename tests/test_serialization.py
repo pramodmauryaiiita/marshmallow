@@ -366,6 +366,15 @@ class TestFieldSerialization:
         field = fields.Email()
         assert field.serialize('email', user) is None
 
+    def test_enum_field_validates(self):
+        from aenum import Enum
+
+        class Color(Enum):
+            RED = 'red'
+
+        field = fields.Enum(Color, by_name=True)
+        assert field.serialize('RED', Color.RED) == 'RED'
+
     def test_dict_field_serialize_none(self, user):
         user.various_data = None
         field = fields.Dict()

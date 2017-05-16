@@ -530,6 +530,15 @@ class TestFieldDeserialization:
             field.deserialize('invalidemail')
         assert excinfo.value.args[0][0] == 'Not a valid email address.'
 
+    def test_enum_field_deserialization(self):
+        from aenum import Enum
+
+        class Color(Enum):
+            RED = 'red'
+
+        field = fields.Enum(Color, by_name=True)
+        assert field.deserialize('RED') == Color.RED
+
     def test_function_field_deserialization_is_noop_by_default(self):
         field = fields.Function(lambda x: None)
         # Default is noop
