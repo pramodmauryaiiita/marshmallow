@@ -1323,11 +1323,11 @@ class Enum(Field):
         'by_value': 'Invalid enum value {input}'
     }
 
-    def __init__(self, enum, by_name=True, error=None, **kwargs):
+    def __init__(self, enum, by_name=True, error=None, allowed_values=None, **kwargs):
         self.enum = enum
         self.by_name = by_name
         self.error = error
-        self.allowed_values = kwargs.pop('allowed_values', None)
+        self.allowed_values = allowed_values
         super(Enum, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
