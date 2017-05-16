@@ -4,6 +4,8 @@ invoke>=0.13.0
 # Soft dependencies
 python-dateutil
 pytz
+aenum
+coverage
 
 # Distribution
 wheel
@@ -13,6 +15,7 @@ twine
 pytest==3.0.2
 tox>=1.5.0
 simplejson
+codecov
 
 # Syntax checking
 flake8==2.4.1

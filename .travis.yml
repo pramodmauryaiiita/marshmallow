@@ -12,9 +12,13 @@ python:
 
 before_install:
   - pip install -U pip
+  - travis_retry pip install codecov
 
 install:
   - pip install -U .[reco]
   - pip install -U -r dev-requirements.txt
+
+after_success:
+  - codecov
 
 script: invoke test

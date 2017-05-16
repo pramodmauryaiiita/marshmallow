@@ -1372,7 +1372,7 @@ class Enum(Field):
             msg = self.error.format(**kwargs)
             raise ValidationError(msg)
         else:
-            super(EnumField, self).fail(key, **kwargs)
+            super(Enum, self).fail(key, **kwargs)
 
 
 # Aliases
