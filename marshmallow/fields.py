@@ -1287,7 +1287,6 @@ class Function(Field):
             return func(value)
 
 
-
 class Constant(Field):
     """A field that (de)serializes to a preset constant.  If you only want the
     constant added for serialization or deserialization, you should use
@@ -1310,6 +1309,70 @@ class Constant(Field):
 
     def _deserialize(self, value, *args, **kwargs):
         return self.constant
+
+
+class Enum(Field):
+    """A Field that takes Enum field
+    
+    :param by_name: defaults to True
+    :param error: custom error message
+    :param allowed_values: allowed list of enums
+    """
+    default_error_messages = {
+        'by_name': 'Invalid enum member {input}',
+        'by_value': 'Invalid enum value {input}'
+    }
+
+    def __init__(self, enum, by_name=True, error=None, **kwargs):
+        self.enum = enum
+        self.by_name = by_name
+        self.error = error
+        self.allowed_values = kwargs.pop('allowed_values', None)
+        super(Enum, self).__init__(**kwargs)
+
+    def _serialize(self, value, attr, obj):
+        if value is None:
+            return None
+        elif self.by_name:
+            return value.name
+        else:
+            return value.value
+
+    def _deserialize(self, value, attr, data):
+        if value is None:
+            return None
+        elif self.by_name:
+            try:
+                val = getattr(self.enum, value)
+                if self.allowed_values and val not in self.allowed_values:
+                    self.fail('by_name', input=attr)
+                return val
+            except AttributeError as e:
+                self.fail('by_name', input=attr)
+        else:
+            try:
+                return self.enum(value)
+            except ValueError as e:
+                self.fail('by_name', input=attr)
+
+    def fail(self, key, **kwargs):
+        """A helper method that simply raises a `ValidationError`.
+        """
+        if self.error:
+            if self.by_name:
+                choices = [mem.name for mem in self.allowed_values] if self.allowed_values \
+                    else \
+                    [mem.name for mem in self.enum]
+                kwargs['choices'] = ', '.join(choices)
+            else:
+                choices = [str(mem.value) for mem in self.allowed_values] if \
+                    self.allowed_values \
+                    else [str(mem.value) for mem in self.enum]
+                kwargs['choices'] = ', '.join(choices)
+            msg = self.error.format(**kwargs)
+            raise ValidationError(msg)
+        else:
+            super(EnumField, self).fail(key, **kwargs)
 
 
 # Aliases
